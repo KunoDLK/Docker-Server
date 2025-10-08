@@ -1,0 +1,5 @@
+.env
+copyparty/copyparty/*
+copyparty/data/*
+bitmagnet/data/*
+.DS_Store
