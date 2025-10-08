@@ -9,7 +9,7 @@ services:
       - 3923:3923
     volumes:
       - ./:/cfg:z
-      - ./data:/w:z
+      - ./data:/data:z
 
     environment:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.2
