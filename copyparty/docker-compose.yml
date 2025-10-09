@@ -1,6 +1,13 @@
 ---
 
 services:
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: CPTunnel  
+    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    restart: unless-stopped
+
   copyparty:
     image: copyparty/ac:latest
     container_name: copyparty
@@ -26,8 +33,19 @@ services:
       retries: 5
       start_period: 15s
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: CPTunnel  
-    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000          # set to your user ID (Linux: id -u)
+      - PGID=1000          # set to your group ID (Linux: id -g)
+      - TZ=UTC             # e.g. Europe/Berlin
+      - WEBUI_PORT=8080    # change if you want a different port
+    volumes:
+      - ./config:/config
+      - ./data/torrent:/downloads
+    ports:
+      - "8080:8080"        # Web UI
+      - "6881:6881"        # BitTorrent TCP
+      - "6881:6881/udp"    # BitTorrent UDP (DHT/Peers)
     restart: unless-stopped
