@@ -4,7 +4,7 @@ services:
   CopypartyTunnel:
     image: cloudflare/cloudflared:latest
     container_name: CPTunnel  
-    command: tunnel --no-autoupdate run --token ${CP_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     restart: unless-stopped
 
 
@@ -25,11 +25,13 @@ services:
       # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
       PYTHONUNBUFFERED: 1
 
-  image-puller:
-    image: docker:cli
-    container_name: image-puller
-    restart: unless-stopped
+  gitea:
+    image: docker.gitea.com/gitea:1.25.4-rootless
+    restart: always
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    entrypoint: /bin/sh
-    command: -c "while true; do OLD_CF=$$(docker image inspect cloudflare/cloudflared:latest --format='{{.Id}}' 2>/dev/null || echo ''); OLD_CP=$$(docker image inspect copyparty/ac:latest --format='{{.Id}}' 2>/dev/null || echo ''); docker pull cloudflare/cloudflared:latest; docker pull copyparty/ac:latest; NEW_CF=$$(docker image inspect cloudflare/cloudflared:latest --format='{{.Id}}'); NEW_CP=$$(docker image inspect copyparty/ac:latest --format='{{.Id}}'); if [ \"$$OLD_CF\" != \"$$NEW_CF\" ] && [ -n \"$$OLD_CF\" ]; then echo \"New cloudflared image detected, restarting CPTunnel...\"; docker restart CPTunnel; fi; if [ \"$$OLD_CP\" != \"$$NEW_CP\" ] && [ -n \"$$OLD_CP\" ]; then echo \"New copyparty image detected, restarting copyparty...\"; docker restart copyparty; fi; echo \"Image check completed at $$(date)\"; sleep 3600; done"
+      - ./data/gitea:/var/lib/gitea
+      - ./:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
