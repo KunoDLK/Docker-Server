@@ -34,17 +34,3 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "3000:3000"
-
-  homeassistant:
-    image: homeassistant/home-assistant:latest
-    container_name: homeassistant
-    restart: unless-stopped
-    privileged: true
-    volumes:
-      - ./data/homeassistant:/config
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    ports:
-      - "8123:8123"
-    environment:
-      - TZ=Europe/London
