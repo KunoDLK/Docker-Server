@@ -7,7 +7,6 @@ services:
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     restart: unless-stopped
 
-
   copyparty:
     image: copyparty/ac:latest
     container_name: copyparty
@@ -40,10 +39,12 @@ services:
     image: homeassistant/home-assistant:latest
     container_name: homeassistant
     restart: unless-stopped
-    network_mode: host
+    privileged: true
     volumes:
       - ./data/homeassistant:/config
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8123:8123"
     environment:
-      - TZ=America/Los_Angeles
+      - TZ=Europe/London
