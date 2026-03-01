@@ -6,6 +6,7 @@ services:
     container_name: CPTunnel  
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     restart: unless-stopped
+    network_mode: host
 
   copyparty:
     image: copyparty/ac:latest
@@ -25,6 +26,7 @@ services:
       PYTHONUNBUFFERED: 1
 
   gitea:
+    container_name: gitea
     image: docker.gitea.com/gitea:1.25.4-rootless
     restart: always
     volumes:
@@ -34,3 +36,10 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "3000:3000"
+
+  convert:
+    container_name: convert
+    image: ghcr.io/${GITHUB_REPOSITORY:-p2r3/convert}:${CONVERT_IMAGE_TAG:-latest}
+    ports:
+      - "3001:80"
+    restart: unless-stopped
